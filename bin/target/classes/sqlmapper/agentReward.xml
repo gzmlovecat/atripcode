@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trip.mapper.AgentRewardMapper" >
+
+    <resultMap id="BaseResultMap" type="com.trip.dto.AgentRewardDto" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="agentId" property="agentId" jdbcType="BIGINT" />
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+        <result column="sub_agentId" property="subAgentId" jdbcType="BIGINT" />
+        <result column="sub_agent_name" property="subAgentName" jdbcType="VARCHAR" />
+        <result column="reward_reason" property="rewardReason" jdbcType="VARCHAR" />
+        <result column="reward_amount" property="rewardAmount" jdbcType="DECIMAL" />
+        <result column="order_id" property="orderId" jdbcType="BIGINT" />
+        <result column="order_id" property="orderId" jdbcType="BIGINT" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="pay_agent_status" property="payAgentStatus" jdbcType="VARCHAR" />
+        <result column="pay_super_agent_status" property="paySuperAgentStatus" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        t.id, t.agent_id,t.agent_name,sub_agent_id,sub_agent_name,reward_reason,reward_amount,order_id,
+        t.created_at,t.created_by,t.updated_at,t.updated_by,o.pay_agent_status,o.pay_super_agent_status
+    </sql>
+
+    <insert id="insertAgentReward" parameterType="com.trip.dto.AgentRewardDto">
+        insert into agent_reward (
+        agent_id,
+        agent_name,
+        sub_agent_id,
+        sub_agent_name,
+        reward_reason,
+        reward_amount,
+        order_id,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by
+        )
+        values (
+        #{agentId,jdbcType=BIGINT},
+        #{agentName,jdbcType=VARCHAR},
+        #{subAgentId,jdbcType=BIGINT},
+        #{subAgentName,jdbcType=VARCHAR},
+        #{rewardReason,jdbcType=VARCHAR},
+        #{rewardAmount,jdbcType=DECIMAL},
+        #{orderId,jdbcType=BIGINT},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT}
+        )
+    </insert>
+
+
+    <update id="updateAgentReward" parameterType="com.trip.dto.AgentRewardDto">
+        update agent_reward t
+        set t.updated_at=#{param.updatedAt},t.updated_by=#{param.updatedBy}
+        <if test="param.rewardAmount != null">
+            ,t.reward_amount=#{param.rewardAmount}
+        </if>
+        where t.order_id=#{param.orderId} and t.agent_id=#{param.agentId}
+    </update>
+
+    <select id="selectAgentRewardByParam" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from agent_reward t
+        INNER JOIN `order` o on t.order_id=o.id
+        where 1=1
+        <if test="agentName != null">
+            and t.agent_name like concat("%",#{agentName},"%")
+        </if>
+        <if test="agentId != null">
+            and t.agent_id=#{agentId}
+        </if>
+        <if test="createdAt != null">
+            and date_format(t.created_at, '%Y-%m')=date_format(#{createdAt}, '%Y-%m')
+        </if>
+        <if test="rewardReason != null ">
+            and t.reward_reason=#{rewardReason}
+        </if>
+
+        <if test="tripNotifyStatus != null">
+            and o.trip_notify_status=#{tripNotifyStatus}
+        </if>
+        <if test="contractSignStatus != null">
+            and o.contract_sign_status=#{contractSignStatus}
+        </if>
+        <if test="buyInsuranceStatus != null">
+            and o.buy_insurance_status=#{buyInsuranceStatus}
+        </if>
+        <if test="payAgentStatus != null">
+            and o.pay_agent_status=#{payAgentStatus}
+        </if>
+        <if test="refundStatus != null">
+            and o.refund_status=#{refundStatus}
+        </if>
+
+        order by t.created_at desc
+    </select>
+
+    <select id="selectAgentTotalIncome" resultType="java.math.BigDecimal">
+        select sum(t.reward_amount)
+        from agent_reward t
+        where 1=1
+        <if test="agentId != null">
+            and t.agent_id=#{agentId}
+        </if>
+    </select>
+
+</mapper>

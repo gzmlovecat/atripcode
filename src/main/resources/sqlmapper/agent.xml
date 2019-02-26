@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trip.mapper.AgentMapper" >
+
+    <resultMap id="BaseResultMap" type="com.trip.dto.AgentDto" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+        <result column="super_agent" property="superAgent" jdbcType="BIGINT" />
+        <result column="super_agent_name" property="superAgentName" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="payee_account" property="payeeAccount" jdbcType="VARCHAR" />
+        <result column="payee_bank" property="payeeBank" jdbcType="VARCHAR" />
+        <result column="payee_name" property="payeeName" jdbcType="VARCHAR" />
+        <result column="payee_phone" property="payeePhone" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="agent_type" property="agentType" jdbcType="VARCHAR" />
+        <result column="agent_type_name" property="agentTypeName" jdbcType="VARCHAR" />
+        <result column="vip_remark" property="vipRemark" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, agent_name,super_agent,status,payee_account,payee_bank,payee_name,payee_phone,
+        created_at,created_by,updated_at,updated_by,agent_type,ac.code_mgroup_name as agent_type_name,vip_remark
+    </sql>
+
+    <insert id="insertAgent" parameterType="com.trip.dto.AgentDto">
+        insert into agent (
+        agent_name,
+        super_agent,
+        status,
+        payee_account,
+        payee_bank,
+        payee_name,
+        payee_phone,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by,
+        agent_type,
+        vip_remark
+        )
+        values (
+        #{agentName,jdbcType=VARCHAR},
+        #{superAgent,jdbcType=VARCHAR},
+        #{status,jdbcType=VARCHAR},
+        #{payeeAccount,jdbcType=VARCHAR},
+        #{payeeBank,jdbcType=VARCHAR},
+        #{payeeName,jdbcType=VARCHAR},
+        #{payeePhone,jdbcType=VARCHAR},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT},
+        #{agentType,jdbcType=VARCHAR},
+        #{vipRemark,jdbcType=VARCHAR}
+        )
+        <selectKey resultType="long" keyProperty="id">
+            SELECT @@IDENTITY AS ID
+        </selectKey>
+    </insert>
+
+    <update id="updateAgent" parameterType="com.trip.dto.AgentDto">
+        update agent t
+        set t.updated_at=#{param.updatedAt},t.updated_by=#{param.updatedBy}
+        <if test="param.agentName != null">
+        	,t.agent_name=#{param.agentName}
+        </if>
+        <if test="param.payeeAccount != null">
+            ,t.payee_account=#{param.payeeAccount}
+        </if>
+        <if test="param.payeeBank != null">
+            ,t.payee_bank=#{param.payeeBank}
+        </if>
+        <if test="param.payeeName != null">
+            ,t.payee_name=#{param.payeeName}
+        </if>
+        <if test="param.payeePhone != null">
+            ,t.payee_phone=#{param.payeePhone}
+        </if>
+        <if test="param.status != null">
+            ,t.status=#{param.status}
+        </if>
+        <if test="param.agentType != null">
+        	,t.agent_type=#{param.agentType}
+        </if>
+        <if test="param.vipRemark != null">
+        	,t.vip_remark=#{param.vipRemark}
+        </if>
+        where t.id=#{param.id}
+    </update>
+
+    <select id="selectAgentByParam" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from agent t
+        LEFT JOIN atrip_code ac on ac.code_lgroup='agent_type' and ac.code_mgroup = t.agent_type
+        where 1=1
+        <if test="agentName != null">
+            and t.agent_name like concat("%",#{agentName},"%")
+        </if>
+        <if test="id != null">
+            and t.id = #{id}
+        </if>
+        <if test="superAgent != null">
+            and t.super_agent = #{superAgent}
+        </if>
+        <if test="status != null">
+        	and t.status = #{status}
+        </if>
+        order by t.created_at desc
+    </select>
+
+    <select id="selectOneAgent" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from agent t
+        LEFT JOIN atrip_code ac on ac.code_lgroup='agent_type' and ac.code_mgroup = t.agent_type
+        where 1=1
+
+        <if test="id != null">
+            and t.id = #{id}
+        </if>
+
+    </select>
+
+    <select id="selectSuperAgentByParam" resultMap="BaseResultMap">
+        select
+        t1.id,t1.agent_name agent_name,t2.id super_agent,t2.agent_name super_agent_name, t1.payee_account, t1.payee_bank,t1.payee_name,t1.payee_phone,
+        t1.agent_type, t1.vip_remark, ac.code_mgroup_name as agent_type_name
+        from agent t1
+        LEFT JOIN agent t2 on t1.super_agent=t2.id
+        LEFT JOIN atrip_code ac on ac.code_lgroup='agent_type' and ac.code_mgroup = t1.agent_type
+        where  t1.id = #{id}
+
+    </select>
+
+    <select id="selectSubAgentNameByParam" resultType="java.lang.String">
+        select
+          group_concat(t.agent_name) subAgent
+        from agent t
+        where t.super_agent=${id}
+
+    </select>
+
+	<update id="updateAgentByParam">
+		update agent t
+        set t.updated_at=now(),t.updated_by=#{id}
+        <if test="agentName != null">
+            ,t.agent_name=#{agentName}
+        </if>
+        where t.id=#{param.id}
+	</update>
+	
+	<select id="selectNickImageUrlByAgentId" resultType="java.util.Map">
+        select t2.nick_name nickName, 
+               t2.avatar_url avatarUrl
+		  from agent t1, account t2
+		 where 1 = 1
+		   and t1.id = t2.agent_id
+		   and t1.id = #{agentId}
+		 limit 1
+    </select>
+    
+</mapper>

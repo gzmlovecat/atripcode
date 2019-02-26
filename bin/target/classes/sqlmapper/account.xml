@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trip.mapper.AccountMapper" >
+
+    <resultMap id="BaseResultMap" type="com.trip.dto.AccountDto" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="account_type" property="accountType" jdbcType="VARCHAR" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="employee_id" property="employeeId" jdbcType="BIGINT" />
+        <result column="agent_id" property="agentId" jdbcType="BIGINT" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="employee_name" property="employeeName" jdbcType="VARCHAR" />
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        t.id, account_type,username, password,t.status,employee_id,agent_id,t.created_at,t.created_by,t.updated_at,t.updated_by
+    </sql>
+
+    <select id="selectAccountByParam" parameterType="com.trip.dto.AccountDto" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from account t
+        where 1=1
+        <if test="account.id!=null">
+            and t.id=#{account.id}
+        </if>
+        <if test="account.username!=null">
+            and t.username=#{account.username}
+        </if>
+
+    </select>
+
+
+    <select id="selectAccountJoinByParam" parameterType="com.trip.dto.AccountDto" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>,employee_name,agent_name
+        from account t
+        LEFT JOIN agent a on t.agent_id=a.id
+        LEFT JOIN employee e on t.employee_id=e.id
+        where 1=1
+        <if test="username!=null">
+            and t.username like concat('%',#{username},'%')
+        </if>
+        <if test="employeeName!=null">
+            and e.employee_name like concat('%',#{employeeName},'%')
+        </if>
+        <if test="agentName!=null">
+            and a.agent_name like concat('%',#{agentName},'%')
+        </if>
+        order by t.created_at desc
+
+    </select>
+
+    <insert id="insertAccount" parameterType="com.trip.dto.AccountDto" useGeneratedKeys="true" keyProperty="id">
+        insert into account(
+            account_type,
+            username,
+            password,
+            status,
+            employee_id,
+            agent_id,
+            created_at,
+            created_by,
+            updated_at,
+            updated_by
+        )
+        values (
+            #{accountType,jdbcType=VARCHAR},
+            #{username,jdbcType=VARCHAR},
+            #{password,jdbcType=VARCHAR},
+            #{status,jdbcType=VARCHAR},
+            #{employeeId,jdbcType=BIGINT},
+            #{agentId,jdbcType=BIGINT},
+            #{createdAt,jdbcType=TIMESTAMP},
+            #{createdBy,jdbcType=BIGINT},
+            #{createdAt,jdbcType=TIMESTAMP},
+            #{createdBy,jdbcType=BIGINT}
+        )
+
+    </insert>
+
+    <update id="updateAccount">
+        update account t
+        set t.updated_at=now(),t.updated_by=#{account.updatedBy}
+        <if test="account.username != null">
+            ,t.username=#{account.username}
+        </if>
+        <if test="account.password != null">
+            ,t.password=#{account.password}
+        </if>
+        <if test="account.status != null">
+            ,t.status=#{account.status}
+        </if>
+        where t.id=#{account.id}
+    </update>
+
+    <select id="checkUserAndPwd" resultMap="BaseResultMap"  >
+        SELECT * from account t where t.username=#{username} and t.password=#{password}
+    </select>
+
+</mapper>

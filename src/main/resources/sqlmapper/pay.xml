@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trip.mapper.PayMapper" >
+	<resultMap id="BaseResultMap" type="com.trip.dto.TraceDto" >
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+        <result column="order_date" property="orderDate" jdbcType="VARCHAR" />
+        <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="pay_status" property="payStatus" jdbcType="VARCHAR" />
+    </resultMap>
+
+
+	<insert id="insertOutTrace" parameterType="com.trip.dto.TraceDto">
+        insert into out_trace (
+	        order_no,
+	        agent_id,
+	        order_date,
+	        pay_status
+        )
+        values (
+	        #{orderNo,jdbcType=VARCHAR},
+	        #{agentId,jdbcType=VARCHAR},
+	        sysdate(),
+	        #{payStatus,jdbcType=VARCHAR}
+        )
+    </insert>
+    
+    <select id="selectTraceByParam" resultType="BaseResultMap">
+        SELECT
+        	a.agent_name , t.order_date, t.order_no, t.pay_status
+        FROM out_trace t
+        LEFT JOIN agent a ON a.agent_id = t.agent_id
+        WHERE 1=1
+        <if test="agentName != null">
+            and a.agent_name like concat("%",#{agentName},"%")
+        </if>
+        <if test="order_date != null">
+            and t.order_date = #{orderDate}
+        </if>
+        <if test="pay_status != null">
+        	and t.pay_status = #{payStatus}
+        </if>
+        order by t.order_date desc
+    </select>
+    
+    <update id="updateTraceByParam">
+		update out_trace t
+        set t.pay_status = #{payStatus}
+        where t.order_no=#{orderNo}
+	</update>
+</mapper>

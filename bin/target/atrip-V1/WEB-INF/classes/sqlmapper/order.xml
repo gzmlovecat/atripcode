@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trip.mapper.OrderMapper" >
+
+    <resultMap id="BaseResultMap" type="com.trip.dto.OrderDto" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="product_name" property="productName" jdbcType="VARCHAR" />
+        <result column="departure" property="departure" jdbcType="BIGINT" />
+        <result column="departure_name" property="departureName" jdbcType="VARCHAR" />
+        <result column="destination" property="destination" jdbcType="BIGINT" />
+        <result column="destination_name" property="destinationName" jdbcType="VARCHAR" />
+        <result column="product_type" property="productType" jdbcType="BIGINT" />
+        <result column="product_type_name" property="productTypeName" jdbcType="VARCHAR" />
+        <result column="trip_type" property="tripType" jdbcType="BIGINT" />
+        <result column="trip_type_name" property="tripTypeName" jdbcType="VARCHAR" />
+        <result column="supplier" property="supplier" jdbcType="BIGINT" />
+        <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+        <result column="departure_time" property="departureTime" jdbcType="TIMESTAMP" />
+        <result column="return_time" property="returnTime" jdbcType="TIMESTAMP" />
+        <result column="tourist" property="tourist" jdbcType="VARCHAR" />
+        <result column="tourist_phone" property="touristPhone" jdbcType="VARCHAR" />
+        <result column="agent_id" property="agentId" jdbcType="BIGINT" />
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+        <result column="super_agent" property="superAgent" jdbcType="BIGINT" />
+        <result column="super_agent_name" property="superAgentName" jdbcType="VARCHAR" />
+        <result column="super_agent_return_ratio" property="superAgentReturnRatio" jdbcType="DECIMAL" />
+        <result column="pay_type" property="payType" jdbcType="VARCHAR" />
+        <result column="trip_notify_status" property="tripNotifyStatus" jdbcType="VARCHAR" />
+        <result column="contract_sign_status" property="contractSignStatus" jdbcType="VARCHAR" />
+        <result column="buy_insurance_status" property="buyInsuranceStatus" jdbcType="VARCHAR" />
+        <result column="gathering_status" property="gatheringStatus" jdbcType="VARCHAR" />
+        <result column="pay_agent_status" property="payAgentStatus" jdbcType="VARCHAR" />
+        <result column="pay_super_agent_status" property="paySuperAgentStatus" jdbcType="VARCHAR" />
+        <result column="pay_supplier_status" property="paySupplierStatus" jdbcType="VARCHAR" />
+        <result column="no_purchase_price" property="noPurchasePrice" jdbcType="VARCHAR" />
+        <result column="refund_status" property="refundStatus" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="salesman" property="salesman" jdbcType="VARCHAR" />
+
+        <result column="adult_purchase_price" property="adultPurchasePrice" jdbcType="DECIMAL" />
+        <result column="children_purchase_price" property="childrenPurchasePrice" jdbcType="DECIMAL" />
+        <result column="baby_purchase_price" property="babyPurchasePrice" jdbcType="DECIMAL" />
+        <result column="single_room_balance" property="singleRoomBalance" jdbcType="DECIMAL" />
+        <result column="plus_fee" property="plusFee" jdbcType="DECIMAL" />
+        <result column="visa_fee" property="visaFee" jdbcType="DECIMAL" />
+        <result column="insurance_fee" property="insuranceFee" jdbcType="DECIMAL" />
+
+        <result column="actual_receipt_amount" property="actualReceiptAmount" jdbcType="DECIMAL" />
+        <result column="actual_pay_agent_amount" property="actualPayAgentAmount" jdbcType="DECIMAL" />
+        <result column="actual_pay_super_agent_amount" property="actualPaySuperAgentAmount" jdbcType="DECIMAL" />
+        <result column="actual_pay_supplie_amount" property="actualPaySupplieAmount" jdbcType="DECIMAL" />
+        <result column="actual_pay_user_refund_amount" property="actualPayUserRefundAmount" jdbcType="DECIMAL" />
+        <result column="need_pay_user_refund_amount" property="needPayUserRefundAmount" jdbcType="DECIMAL" />
+
+        <result column="version" property="version" jdbcType="INTEGER" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, product_name,departure,destination,product_type,
+        trip_type,supplier,departure_time,return_time,
+        tourist,tourist_phone,agent_id,super_agent,
+        super_agent_return_ratio,pay_type,
+        trip_notify_status,contract_sign_status,buy_insurance_status,
+        gathering_status,pay_agent_status,pay_super_agent_status,
+        pay_supplier_status,no_purchase_price,refund_status,
+        created_at,created_by,updated_at,updated_by,salesman,
+        adult_purchase_price,children_purchase_price,baby_purchase_price,
+        single_room_balance,plus_fee,visa_fee,insurance_fee,
+        actual_receipt_amount,actual_pay_agent_amount,actual_pay_super_agent_amount,
+        actual_pay_supplie_amount,actual_pay_user_refund_amount,need_pay_user_refund_amount,version
+    </sql>
+
+    <sql id="complex_Column_List" >
+        t.id, product_name,departure,a1.address_detail departure_name,destination,a2.address_detail destination_name,product_type,pt.product_type_name,
+        trip_type,tt.trip_type_name,supplier,s.supplier_name,departure_time,return_time,
+        tourist,tourist_phone,agent_id,ag.agent_name,t.super_agent,sag.agent_name super_agent_name,
+        super_agent_return_ratio,pay_type,
+        trip_notify_status,contract_sign_status,buy_insurance_status,
+        gathering_status,pay_agent_status,pay_super_agent_status,
+        pay_supplier_status,no_purchase_price,refund_status,
+        t.created_at,t.created_by,t.updated_at,t.updated_by,t.salesman,
+        adult_purchase_price,children_purchase_price,baby_purchase_price,
+        single_room_balance,plus_fee,visa_fee,insurance_fee,
+        actual_receipt_amount,actual_pay_agent_amount,actual_pay_super_agent_amount,
+        actual_pay_supplie_amount,actual_pay_user_refund_amount,need_pay_user_refund_amount,version
+    </sql>
+
+
+    <insert id="insertOrder" parameterType="com.trip.dto.OrderDto" useGeneratedKeys="true" keyProperty="id">
+        insert into `order` (
+            product_name,departure,destination,product_type,
+            trip_type,supplier,departure_time,return_time,
+            tourist,tourist_phone,agent_id,super_agent,
+            super_agent_return_ratio,pay_type,
+            trip_notify_status,contract_sign_status,buy_insurance_status,
+            gathering_status,pay_agent_status,pay_super_agent_status,
+            pay_supplier_status,no_purchase_price,refund_status,
+            created_at,created_by,updated_at,updated_by,salesman,
+            adult_purchase_price,children_purchase_price,baby_purchase_price,
+            single_room_balance,plus_fee,visa_fee,insurance_fee,version
+        )
+        values (
+            #{productName,jdbcType=VARCHAR},
+            #{departure,jdbcType=BIGINT},
+            #{destination,jdbcType=VARCHAR},
+            #{productType,jdbcType=BIGINT},
+            #{tripType,jdbcType=BIGINT},
+            #{supplier,jdbcType=BIGINT},
+            #{departureTime,jdbcType=DATE},
+            #{returnTime,jdbcType=DATE},
+            #{tourist,jdbcType=VARCHAR},
+            #{touristPhone,jdbcType=VARCHAR},
+            #{agentId,jdbcType=BIGINT},
+            #{superAgent,jdbcType=BIGINT},
+            #{superAgentReturnRatio,jdbcType=DECIMAL},
+            #{payType,jdbcType=VARCHAR},
+            '0',
+            '0',
+            '0',
+            '0',
+            '0',
+            '0',
+            '0',
+            '0',
+            '0',
+            #{createdAt,jdbcType=TIMESTAMP},
+            #{createdBy,jdbcType=VARCHAR},
+            #{createdAt,jdbcType=TIMESTAMP},
+            #{createdBy,jdbcType=VARCHAR},
+            #{salesman,jdbcType=VARCHAR},
+            #{adultPurchasePrice,jdbcType=DECIMAL},
+            #{childrenPurchasePrice,jdbcType=DECIMAL},
+            #{babyPurchasePrice,jdbcType=DECIMAL},
+            #{singleRoomBalance,jdbcType=DECIMAL},
+            #{plusFee,jdbcType=DECIMAL},
+            #{visaFee,jdbcType=DECIMAL},
+            #{insuranceFee,jdbcType=DECIMAL},
+            0
+        )
+
+    </insert>
+
+    <select id="selectOrderList" resultMap="BaseResultMap">
+
+        select
+
+          <include refid="complex_Column_List"/>
+        from `order` t
+        LEFT JOIN address a1 on a1.id=t.departure
+        LEFT JOIN address a2 on a2.id=t.destination
+        LEFT JOIN product_type pt on pt.id=t.product_type
+        LEFT JOIN trip_type tt on tt.id=t.trip_type
+        LEFT JOIN supplier s on s.id=t.supplier
+        LEFT JOIN agent ag on ag.id=t.agent_id
+        LEFT JOIN agent sag on sag.id=t.super_agent
+        where 1=1
+        <if test="param.orderId!=null">
+            and t.id=#{param.orderId}
+        </if>
+        <if test="param.orderCreateStartTime!=null">
+            and t.created_at>=#{param.orderCreateStartTime}
+        </if>
+        <if test="param.orderCreateEndTime!=null">
+            <![CDATA[
+            and t.created_at<=#{param.orderCreateEndTime}
+            ]]>
+        </if>
+        <if test="param.tripCreateStartTime!=null">
+            and t.departure_time>=#{param.tripCreateStartTime}
+        </if>
+        <if test="param.tripCreateEndTime!=null">
+            <![CDATA[
+            and t.departure_time<=#{param.tripCreateEndTime}
+            ]]>
+        </if>
+        <if test="param.productName!=null">
+            and t.product_name = #{param.productName}
+        </if>
+        <if test="param.supplierId!=null">
+            and t.supplier_id = #{param.supplierId}
+        </if>
+        <if test="param.salesman!=null">
+            and t.created_by = #{param.salesman}
+        </if>
+        <if test="param.touristPhone!=null">
+            and t.tourist_phone = #{param.touristPhone}
+        </if>
+        <if test="param.agentId!=null">
+            and t.agent_id = #{param.agentId}
+        </if>
+        <if test="param.tripNotifyStatus!=null and param.tripNotifyStatus!=0 ">
+            and t.trip_notify_status = #{param.tripNotifyStatus}
+        </if>
+        <if test="param.contractSignStatus!=null and param.contractSignStatus!=0  ">
+            and t.contract_sign_status = #{param.contractSignStatus}
+        </if>
+        <if test="param.buyInsuranceStatus!=null and param.buyInsuranceStatus!=0 ">
+            and t.buy_insurance_status = #{param.buyInsuranceStatus}
+        </if>
+        <if test="param.gatheringStatus!=null and param.gatheringStatus!=0 ">
+            and t.gathering_status = #{param.gatheringStatus}
+        </if>
+        <if test="param.payAgentStatus!=null and param.payAgentStatus!=0 ">
+            and t.pay_agent_status = #{param.payAgentStatus}
+        </if>
+        <if test="param.paySuperAgentStatus!=null and param.paySuperAgentStatus!=0 ">
+            and t.pay_super_agent_status = #{param.paySuperAgentStatus}
+        </if>
+        <if test="param.paySupplierStatus!=null and param.paySupplierStatus!=0 ">
+            and t.pay_supplier_status = #{param.paySupplierStatus}
+        </if>
+        <if test="param.noPurchasePrice!=null and param.noPurchasePrice!=0 ">
+            and t.no_purchase_price = #{param.noPurchasePrice}
+        </if>
+        <if test="param.refundStatus!=null and param.refundStatus!=0 ">
+            and t.refund_status = #{param.refundStatus}
+        </if>
+        <if test="param.createdBy!=null">
+            and t.created_by = #{param.createdBy}
+        </if>
+        order by t.created_at desc
+
+    </select>
+
+    <select id="selectOneOrder" resultMap="BaseResultMap">
+
+        select
+        <include refid="Base_Column_List"/>
+        from `order` t
+        where t.id=#{id}
+
+    </select>
+
+
+    <update id="updateOrder" parameterType="com.trip.entity.OrderQueryResultEntity">
+        update `order` t
+        set t.updated_at=now(),t.updated_by=#{param.updatedBy},t.version=version+1
+        <if test="param.adultPurchasePrice != null">
+            ,t.adult_purchase_price=#{param.adultPurchasePrice}
+        </if>
+        <if test="param.babyPurchasePrice != null">
+            ,t.baby_purchase_price=#{param.babyPurchasePrice}
+        </if>
+        <if test="param.childrenPurchasePrice != null">
+            ,t.children_purchase_price=#{param.childrenPurchasePrice}
+        </if>
+        <if test="param.plusFee != null">
+            ,t.plus_fee=#{param.plusFee}
+        </if>
+        <if test="param.singleRoomBalance != null">
+            ,t.single_room_balance=#{param.singleRoomBalance}
+        </if>
+        <if test="param.visaFee != null">
+            ,t.visa_fee=#{param.visaFee}
+        </if>
+        <if test="param.tripNotifyStatus != null">
+            ,t.trip_notify_status=#{param.tripNotifyStatus}
+        </if>
+        <if test="param.contractSignStatus != null">
+            ,t.contract_sign_status=#{param.contractSignStatus}
+        </if>
+        <if test="param.buyInsuranceStatus != null">
+            ,t.buy_insurance_status=#{param.buyInsuranceStatus}
+        </if>
+
+        <if test="param.rAStatus != null">
+            ,t.gathering_status=#{param.rAStatus}
+        </if>
+        <if test="param.aAStatus != null">
+            ,t.pay_agent_status=#{param.aAStatus}
+        </if>
+        <if test="param.sAAStatus != null">
+            ,t.pay_super_agent_status=#{param.sAAStatus}
+        </if>
+        <if test="param.sAStatus != null">
+            ,t.pay_supplier_status=#{param.sAStatus}
+        </if>
+        <if test="param.rFAStatus != null">
+            ,t.refund_status=#{param.rFAStatus}
+        </if>
+        <if test="param.rAActualReceipt != null">
+            ,t.actual_receipt_amount=#{param.rAActualReceipt}
+        </if>
+        <if test="param.aAActualReceipt != null">
+            ,t.actual_pay_agent_amount=#{param.aAActualReceipt}
+        </if>
+        <if test="param.sAAActualReceipt != null">
+            ,t.actual_pay_super_agent_amount=#{param.sAAActualReceipt}
+        </if>
+        <if test="param.sAActualReceipt != null">
+            ,t.actual_pay_supplie_amount=#{param.sAActualReceipt}
+        </if>
+        <if test="param.rFAActualReceipt != null">
+            ,t.actual_pay_user_refund_amount=#{param.rFAActualReceipt}
+        </if>
+        <if test="param.rFAReceivable != null">
+            ,t.need_pay_user_refund_amount=#{param.rFAReceivable}
+        </if>
+        where t.id=#{param.id} and t.version=#{param.version}
+    </update>
+
+
+
+</mapper>

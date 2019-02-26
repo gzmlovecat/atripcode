@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="atrip:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="atrip-V1.war">
+      <element id="artifact" artifact-name="atrip:war exploded" />
+    </root>
+  </artifact>
+</component>

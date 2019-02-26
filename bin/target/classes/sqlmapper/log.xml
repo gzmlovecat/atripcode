@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trip.mapper.LogMapper" >
+
+    <resultMap id="BaseResultMap" type="com.trip.dto.LogDto" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="log_type" property="logType" jdbcType="VARCHAR" />
+        <result column="operate_type" property="operateType" jdbcType="DATE" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, log_type,operate_type,created_at,created_by,updated_at,updated_by
+    </sql>
+
+    <insert id="insertLog" parameterType="com.trip.dto.LogDto">
+        insert into operate_log (
+        log_type,
+        operate_type,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by
+        )
+        values (
+        #{logType,jdbcType=VARCHAR},
+        #{operateType,jdbcType=VARCHAR},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT}
+        )
+        <selectKey resultType="long" keyProperty="id">
+            SELECT @@IDENTITY AS ID
+        </selectKey>
+    </insert>
+
+    <select id="selectLogByParam" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from operate_log t
+        where t.log_type = #{logType}
+        order by t.created_at desc
+
+    </select>
+
+
+
+
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trip.mapper.TripTypeMapper" >
+
+    <resultMap id="BaseResultMap" type="com.trip.dto.TripTypeDto" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="trip_type_name" property="tripTypeName" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, trip_type_name,created_at,created_by,updated_at,updated_by
+    </sql>
+
+    <select id="selectTripTypeList" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from trip_type t
+        where 1=1
+        <if test="tripTypeName != null">
+            and t.trip_type_name like concat("%",#{tripTypeName},"%")
+        </if>
+        order by t.created_at desc
+    </select>
+
+
+    <insert id="insertTripType" parameterType="com.trip.dto.TripTypeDto">
+        insert into trip_type (
+        trip_type_name,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by
+        )
+        values (
+        #{tripTypeName,jdbcType=VARCHAR},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT}
+        )
+        <selectKey resultType="long" keyProperty="id">
+            SELECT @@IDENTITY AS ID
+        </selectKey>
+    </insert>
+
+</mapper>

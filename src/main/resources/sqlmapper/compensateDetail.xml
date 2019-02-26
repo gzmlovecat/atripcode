@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trip.mapper.CompensateDetailMapper" >
+
+    <!-- <resultMap id="BaseResultMap" type="com.trip.dto.BookDetailDto" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="standard" property="standard" jdbcType="VARCHAR" />
+        <result column="sale_price" property="salePrice" jdbcType="DECIMAL" />
+        <result column="agent_return_amount" property="agentReturnAmount" jdbcType="DECIMAL" />
+        <result column="buy_amount" property="buyAmount" jdbcType="DECIMAL" />
+        <result column="version" property="version" jdbcType="BIGINT" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, standard,sale_price,agent_return_amount,buy_amount,version,
+        created_at,created_by,updated_at,updated_by
+    </sql>
+
+    <insert id="insertBookDetail" parameterType="com.trip.dto.BookDetailDto"  useGeneratedKeys="true" keyProperty="id">
+        insert into book_detail (
+            order_id,
+            standard,
+            sale_price,
+            agent_return_amount,
+            buy_amount,
+            version,
+            created_at,
+            created_by,
+            updated_at,
+            updated_by
+        )
+        values (
+            #{orderId,jdbcType=BIGINT},
+            #{standard,jdbcType=VARCHAR},
+            #{salePrice,jdbcType=VARCHAR},
+            #{agentReturnAmount,jdbcType=DECIMAL},
+            #{buyAmount,jdbcType=DECIMAL},
+            #{version,jdbcType=BIGINT},
+            #{createdAt,jdbcType=TIMESTAMP},
+            #{createdBy,jdbcType=VARCHAR},
+            #{createdAt,jdbcType=TIMESTAMP},
+            #{createdBy,jdbcType=VARCHAR}
+        )
+
+    </insert>
+
+    <select id="selectBookDetailList" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from book_detail t
+        where 1=1
+        <if test="param.orderId!=null">
+            and t.order_id=#{param.orderId}
+        </if>
+        <if test="param.version!=null">
+            and t.version=#{param.version}
+        </if>
+
+    </select>
+
+    <select id="selectBookDetailVersion" resultType="java.util.Map">
+        select
+          min(t.version) minVersion,max(t.version) maxVersion
+        from book_detail t
+        where t.order_id=#{orderId}
+
+    </select>
+
+
+
+    <update id="updateBookDetailVersion" parameterType="com.trip.dto.BookDetailDto">
+        update book_detail t
+        set t.updated_at=#{param.updatedAt},t.updated_by=#{param.updatedBy},t.version=#{param.version}
+        where t.order_id=#{param.orderId} and t.version=#{param.oldVersion}
+    </update> -->
+
+
+    <select id="selectCompensateHistory" resultType="java.util.Map">
+        SELECT
+            t.id as compensateId, t.version,
+            t.compensation_price as compensationPrice,
+            t.remark,
+            t.created_at as createdAt,
+            t.created_by as createdBy
+        FROM compensate_detail t
+        where t.order_id=#{orderId}
+
+    </select>
+    
+    <insert id="insertCompensateDetail" parameterType="com.trip.dto.CompensateDetailDto"  useGeneratedKeys="true" keyProperty="id">
+        insert into compensate_detail (
+            order_id,
+            compensation_price,
+            remark,
+            version,
+            created_at,
+            created_by,
+            updated_at,
+            updated_by
+        )
+        values (
+            #{orderId,jdbcType=BIGINT},
+            #{compensationPrice,jdbcType=DECIMAL},
+            #{remark,jdbcType=VARCHAR},
+            #{version,jdbcType=BIGINT},
+            #{createdAt,jdbcType=TIMESTAMP},
+            #{createdBy,jdbcType=VARCHAR},
+            #{createdAt,jdbcType=TIMESTAMP},
+            #{createdBy,jdbcType=VARCHAR}
+        )
+
+    </insert>
+    
+    <select id="selectCompensateDetailPriceByParam" resultType="java.util.Map">
+        select
+          sum(t.compensation_price) compensationPrice
+        from compensate_detail t
+        where t.order_id=#{orderId}
+
+    </select>
+
+</mapper>

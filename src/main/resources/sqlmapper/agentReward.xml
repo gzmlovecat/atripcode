@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trip.mapper.AgentRewardMapper" >
+
+    <resultMap id="BaseResultMap" type="com.trip.dto.AgentRewardDto" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="agent_id" property="agentId" jdbcType="BIGINT" />
+        <result column="agent_name" property="agentName" jdbcType="VARCHAR" />
+        <result column="sub_agentId" property="subAgentId" jdbcType="BIGINT" />
+        <result column="sub_agent_name" property="subAgentName" jdbcType="VARCHAR" />
+        <result column="reward_reason" property="rewardReason" jdbcType="VARCHAR" />
+        <result column="reward_amount" property="rewardAmount" jdbcType="DECIMAL" />
+        <result column="order_id" property="orderId" jdbcType="BIGINT" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" jdbcType="BIGINT" />
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+        <result column="pay_agent_status" property="payAgentStatus" jdbcType="VARCHAR" />
+        <result column="pay_super_agent_status" property="paySuperAgentStatus" jdbcType="VARCHAR" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="avatar_url" property="avatarUrl" jdbcType="VARCHAR" />
+        <result column="agent_type" property="agentType" jdbcType="VARCHAR" />
+        <result column="agent_type_name" property="agentTypeName" jdbcType="VARCHAR" />
+        <result column="nick_name" property="nickName" jdbcType="VARCHAR" />
+        <result column="reward_type" property="rewardType" jdbcType="VARCHAR" />
+        <result column="reward_extra_amount" property="rewardExtraAmount" jdbcType="DECIMAL" />
+        <result column="extra_type" property="extraType" jdbcType="VARCHAR" />
+        <result column="order_yn" property="orderYn" jdbcType="VARCHAR" />
+        <result column="use_yn" property="useYn" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        t.id, t.agent_id,t.agent_name,sub_agent_id,sub_agent_name,reward_reason,reward_amount,order_id,
+        t.created_at,t.created_by,t.updated_at,t.updated_by,t.pay_agent_status,t.reward_type,t.reward_extra_amount,
+        t.extra_type,t.order_yn,t.use_yn
+    </sql>
+
+    <insert id="insertAgentReward" parameterType="com.trip.dto.AgentRewardDto">
+        insert into agent_reward (
+        agent_id,
+        agent_name,
+        sub_agent_id,
+        sub_agent_name,
+        reward_reason,
+        reward_amount,
+        order_id,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by,
+        reward_type,
+        reward_extra_amount,
+        extra_type,
+        pay_agent_status,
+        order_yn
+        )
+        values (
+        #{agentId,jdbcType=BIGINT},
+        #{agentName,jdbcType=VARCHAR},
+        #{subAgentId,jdbcType=BIGINT},
+        #{subAgentName,jdbcType=VARCHAR},
+        #{rewardReason,jdbcType=VARCHAR},
+        #{rewardAmount,jdbcType=DECIMAL},
+        #{orderId,jdbcType=BIGINT},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT},
+        #{createdAt,jdbcType=TIMESTAMP},
+        #{createdBy,jdbcType=BIGINT},
+        #{rewardType,jdbcType=VARCHAR},
+        #{rewardExtraAmount,jdbcType=DECIMAL},
+        #{extraType,jdbcType=VARCHAR},
+        #{payAgentStatus,jdbcType=VARCHAR},
+        #{orderYn,jdbcType=VARCHAR}
+        )
+    </insert>
+
+
+    <update id="updateAgentReward" parameterType="com.trip.dto.AgentRewardDto">
+        update agent_reward t
+        set t.updated_at=#{param.updatedAt},t.updated_by=#{param.updatedBy}
+        <if test="param.rewardAmount != null">
+            ,t.reward_amount=#{param.rewardAmount}
+        </if>
+        where t.order_id=#{param.orderId} and t.agent_id=#{param.agentId}
+    </update>
+
+    <select id="selectAgentRewardByParam" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from agent_reward t
+        INNER JOIN `order` o on t.order_id=o.id
+        where 1=1
+          and t.use_yn = '1'
+          and o.order_status not in ('2', '3')
+        <if test="agentName != null">
+            and t.agent_name like concat("%",#{agentName},"%")
+        </if>
+        <if test="agentId != null">
+            and t.agent_id=#{agentId}
+        </if>
+        <if test="createdAt != null">
+        	<![CDATA[
+            and date_format(t.created_at, '%Y-%m')<=date_format(#{createdAt}, '%Y-%m')
+            ]]>
+        </if>
+        <if test="rewardType != null ">
+            and t.reward_type=#{rewardType}
+        </if>
+
+        <if test="tripNotifyStatus != null">
+            and o.trip_notify_status=#{tripNotifyStatus}
+        </if>
+        <if test="contractSignStatus != null">
+            and o.contract_sign_status=#{contractSignStatus}
+        </if>
+        <if test="buyInsuranceStatus != null">
+            and o.buy_insurance_status=#{buyInsuranceStatus}
+        </if>
+        <if test="payAgentStatus != null">
+            and o.pay_agent_status=#{payAgentStatus}
+        </if>
+        <if test="refundStatus != null">
+            and o.refund_status=#{refundStatus}
+        </if>
+        <if test="orderId != null">
+        	and t.order_id = #{orderId}
+        </if>
+
+        order by t.created_at desc
+    </select>
+
+    <select id="selectAgentTotalIncome" resultType="java.math.BigDecimal">
+        select sum(t1.reward_amount)
+          from agent_reward t1, `order` t2
+         where 1=1
+           and t1.use_yn = '1'
+           and t1.order_id = t2.id
+           and t2.order_status not in ('2', '3')
+           <if test="agentId != null">
+           and t1.agent_id=#{agentId}
+           </if>
+    </select>
+    
+    <select id="selectAgentDayOfMonthIncome" resultType="java.math.BigDecimal">
+    	select sum(t1.reward_amount)
+          from agent_reward t1, `order` t2
+         where 1=1
+           and t1.use_yn = '1'
+           and t1.order_id = t2.id
+           and t2.order_status not in ('2', '3')
+           <if test="agentId != null">
+           and t1.agent_id=#{agentId}
+           </if>
+           <![CDATA[
+           and t1.created_at < DATE_ADD(curdate(),interval 1 day)
+           ]]>
+           and t1.created_at >= DATE_ADD(curdate(),interval -30 day)
+    </select>
+    
+    <select id="selectSaleTotal" resultType="java.math.BigDecimal">
+    	select sum(t3.sale_price * t3.buy_amount) 
+  		  from (select max(t2.version) max_version,t2.order_id 
+                  from agent_reward t1, book_detail t2, `order` t4 
+                 where 1 = 1 
+                   and t1.use_yn = '1'
+                   and t1.order_id = t2.order_id
+                   and t2.order_id = t4.id
+                   and t4.order_status not in ('2', '3')
+                 <if test="agentId != null">
+                   and t1.agent_id = #{agentId}
+                 </if>
+                 <if test="dayOfMonth != null">
+                   <![CDATA[
+            	   and t1.created_at < DATE_ADD(curdate(),interval 1 day)
+          		   ]]>
+          		   and t1.created_at >= DATE_ADD(curdate(),interval -30 day)
+                 </if>
+                 group by t2.order_id) a1, book_detail t3
+         where 1 = 1 
+           and a1.order_id = t3.order_id 
+           and a1.max_version = t3.version
+    </select>
+    
+    <select id="selectMyTeam" resultMap="BaseResultMap">
+    	<!--  select t1.id, 
+			   t1.agent_name, 
+			   sum(t2.reward_amount) as reward_amount, 
+			   t3.id, 
+			   t3.username,
+			   t3.avatar_url, 
+			   t3.created_at,
+			   t1.agent_type,
+			   ac.code_mgroup_name as agent_type_name,
+			   t3.nick_name
+		  from agent t1
+		  LEFT JOIN agent_reward t2 on t2.agent_id = t1.id and t2.reward_reason = 'agentReward' and t2.use_yn = '1'
+		  LEFT JOIN account t3 on t3.agent_id = t1.id
+		  LEFT JOIN atrip_code ac on ac.code_lgroup='agent_type' and ac.code_mgroup = t1.agent_type
+		  LEFT JOIN `order` t4 on t2.order_id = t4.id
+		 where 1 = 1
+		   and t4.order_status not in ('2', '3')
+		 <if test="agentId != null">
+		   and t1.super_agent = #{agentId}
+		 </if>
+		 group by t1.id, 
+		 		  t1.agent_name, 
+		 		  t3.created_at, 
+		 		  t3.avatar_url,
+		 		  t3.id, 
+		 		  t3.username,
+		 		  t1.agent_type,
+		 		  ac.code_mgroup_name,
+		 		  t3.nick_name
+		 order by sum(t2.reward_amount) desc-->
+		 select t4.agent_id,
+			     t4.agent_name,
+			     case when sum(t6.reward_amount) is NULL then 0 else sum(t6.reward_amount) END as reward_amount, 
+			     t4.account_id,
+			     t4.username,
+			     t4.avatar_url,
+			     t4.created_at,
+			     t4.agent_type,
+			     t4.agent_type_name,
+			     t4.nick_name
+			    from (select t1.id agent_id, 
+			      t1.agent_name, 
+			      t3.id as account_id, 
+			      t3.username,
+			      t3.avatar_url, 
+			      t3.created_at,
+			      t1.agent_type,
+			      ac.code_mgroup_name as agent_type_name,
+			      t3.nick_name,
+			     t2.order_id
+			    from agent t1
+			    LEFT JOIN agent_reward t2 on t2.agent_id = t1.id and t2.reward_reason = 'agentReward' and t2.use_yn = '1'
+			    LEFT JOIN account t3 on t3.agent_id = t1.id
+			    LEFT JOIN atrip_code ac on ac.code_lgroup='agent_type' and ac.code_mgroup = t1.agent_type
+			   where 1 = 1
+			     <if test="agentId != null">
+		         and t1.super_agent = #{agentId}
+		         </if>
+			) t4
+			 LEFT JOIN `order` t5 on t4.order_id = t5.id and t5.order_status not in ('2', '3')
+			 LEFT JOIN agent_reward t6  on t5.id = t6.order_id and t5.order_status not in ('2', '3')
+			where 1 = 1
+			group by t4.agent_id, 
+			      t4.agent_name, 
+			      t4.created_at, 
+			      t4.avatar_url,
+			      t4.account_id, 
+			      t4.username,
+			       t4.agent_type,
+			     t4.agent_type_name,
+			     t4.nick_name
+		   order by sum(t6.reward_amount) desc
+    </select>
+    
+    <select id="selectMyTeamImage" resultMap="BaseResultMap">
+        <!--  select t1.id, 
+			   t1.agent_name, 
+			   sum(t2.reward_amount) as reward_amount, 
+			   t3.id, 
+			   t3.username,
+			   t3.avatar_url, 
+			   t3.created_at,
+			   t1.agent_type,
+			   ac.code_mgroup_name as agent_type_name,
+			   t3.nick_name
+		  from agent t1
+		  LEFT JOIN agent_reward t2 on t2.agent_id = t1.id and t2.reward_reason = 'agentReward' and t2.use_yn = '1'
+		  LEFT JOIN account t3 on t3.agent_id = t1.id
+		  LEFT JOIN atrip_code ac on ac.code_lgroup='agent_type' and ac.code_mgroup = t1.agent_type
+		 where 1 = 1
+		 <if test="agentId != null">
+		   and t1.super_agent = #{agentId}
+		 </if>
+		 group by t1.id, 
+		 		  t1.agent_name, 
+		 		  t3.created_at, 
+		 		  t3.avatar_url,
+		 		  t3.id, 
+		 		  t3.username,
+		 		  t1.agent_type,
+		 		  ac.code_mgroup_name,
+		 		  t3.nick_name
+		 order by t1.create_at desc, sum(t2.reward_amount) desc
+		 limit 4 -->
+		 select t4.agent_id,
+			     t4.agent_name,
+			     case when sum(t6.reward_amount) is NULL then 0 else sum(t6.reward_amount) END as reward_amount, 
+			     t4.account_id,
+			     t4.username,
+			     t4.avatar_url,
+			     t4.created_at,
+			     t4.agent_type,
+			     t4.agent_type_name,
+			     t4.nick_name
+			    from (select t1.id agent_id, 
+			      t1.agent_name, 
+			      t3.id as account_id, 
+			      t3.username,
+			      t3.avatar_url, 
+			      t3.created_at,
+			      t1.agent_type,
+			      ac.code_mgroup_name as agent_type_name,
+			      t3.nick_name,
+			     t2.order_id
+			    from agent t1
+			    LEFT JOIN agent_reward t2 on t2.agent_id = t1.id and t2.reward_reason = 'agentReward' and t2.use_yn = '1'
+			    LEFT JOIN account t3 on t3.agent_id = t1.id
+			    LEFT JOIN atrip_code ac on ac.code_lgroup='agent_type' and ac.code_mgroup = t1.agent_type
+			   where 1 = 1
+			     <if test="agentId != null">
+		         and t1.super_agent = #{agentId}
+		         </if>
+			) t4
+			 LEFT JOIN `order` t5 on t4.order_id = t5.id and t5.order_status not in ('2', '3')
+			 LEFT JOIN agent_reward t6  on t5.id = t6.order_id and t5.order_status not in ('2', '3')
+			where 1 = 1
+			group by t4.agent_id, 
+			      t4.agent_name, 
+			      t4.created_at, 
+			      t4.avatar_url,
+			      t4.account_id, 
+			      t4.username,
+			      t4.agent_type,
+			      t4.agent_type_name,
+			      t4.nick_name
+		    order by t4.created_at desc, sum(t6.reward_amount) desc
+    </select>
+    
+    <select id="selectExtraRewardAmount" resultType="java.math.BigDecimal">
+    	select sum(t1.reward_extra_amount)
+          from agent_reward t1, `order` t2
+         where 1=1
+           and t1.use_yn = '1'
+           and t1.order_id = t2.id
+           <if test="agentId != null">
+           and t1.agent_id=#{agentId}
+           </if>
+           and t2.order_status not in ('2', '3')
+    </select>
+    
+     <update id="updateAgentRewardById" parameterType="com.trip.dto.AgentRewardDto">
+        update agent_reward t
+        set t.updated_at=#{param.updatedAt},t.updated_by=#{param.updatedBy}
+        <!--  
+        <if test="param.rewardAmount != null">
+            ,t.reward_amount=#{param.rewardAmount}
+        </if>
+        <if test="param.extraType != null">
+            ,t.extra_type=#{param.extraType}
+        </if>
+        <if test="param.rewardExtraAmount != null">
+            ,t.reward_extra_amount=#{param.rewardExtraAmount}
+        </if>
+        -->
+        <if test="param.payAgentStatus != null">
+            ,t.pay_agent_status=#{param.payAgentStatus}
+        </if>
+        <!-- 
+        <if test="param.rewardReason != null">
+        	,t.reward_reason=#{param.rewardReason}
+        </if>
+        -->
+        <if test="param.useYn != null">
+        	,t.use_yn = #{param.useYn}
+        </if>
+        where t.id=#{param.id} and t.order_yn = '2' and t.use_yn = '1'
+    </update>
+    
+    <update id="updatePayAgentStatusByOrderId" parameterType="com.trip.dto.AgentRewardDto">
+        update agent_reward t
+        set t.updated_at=#{param.updatedAt},t.updated_by=#{param.updatedBy}
+        <if test="param.payAgentStatus != null">
+            ,t.pay_agent_status=#{param.payAgentStatus}
+        </if>
+        where t.order_id=#{param.orderId} and t.reward_type=#{param.rewardType} and t.order_yn = '1'
+    </update>
+    
+</mapper>
