@@ -76,7 +76,7 @@ public class PayController{
 			packageParams.put("nonce_str", nonce_str);
 			packageParams.put("body", body);
 			packageParams.put("out_trade_no", order_no);//商户订单号
-			packageParams.put("total_fee", "0.01");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
+			packageParams.put("total_fee", "39900");//支付金额，这边需要转成字符串类型，否则后面的签名会失败
 			packageParams.put("spbill_create_ip", spbill_create_ip);
 			packageParams.put("notify_url", WxPayConfig.notify_url);//支付成功后的回调地址
 			packageParams.put("trade_type", WxPayConfig.TRADETYPE);//支付方式
@@ -96,7 +96,7 @@ public class PayController{
                     + "<openid>" + openid + "</openid>" 
                     + "<out_trade_no>" + order_no + "</out_trade_no>" 
                     + "<spbill_create_ip>" + spbill_create_ip + "</spbill_create_ip>" 
-                    + "<total_fee>" + "1" + "</total_fee>"
+                    + "<total_fee>" + "39900" + "</total_fee>"
                     + "<trade_type>" + WxPayConfig.TRADETYPE + "</trade_type>" 
                     + "<sign>" + mysign + "</sign>"
                     + "</xml>";
