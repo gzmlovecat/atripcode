@@ -64,7 +64,7 @@ public class PayController{
 			//生成的随机字符串
 			String nonce_str = StringUtils.getRandomStringByLength(32);
 			//商品名称
-			String body = "测试商品名称";
+			String body = "商品名称";
 			//获取客户端的ip地址
 			String spbill_create_ip = IpUtils.getIpAddr(request);
 			String order_no = this.doOrderNum();
